@@ -1,6 +1,6 @@
 (ns todo.server
   (:require [clojure.java.io :as io]
-            [todo.dev :refer [is-dev? inject-devmode-html browser-repl start-figwheel]]
+            [todo.dev :refer [is-dev? inject-devmode-html start-figwheel]]
             [compojure.core :refer [GET defroutes]]
             [compojure.route :refer [resources]]
             [compojure.handler :refer [api]]
