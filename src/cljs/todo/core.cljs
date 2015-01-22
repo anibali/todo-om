@@ -30,17 +30,26 @@
     om/IDisplayName
     (display-name [this] "Add list item")
     om/IRenderState
-    (render-state [this {:keys [add-new]}]
-            (html [:input
-                   {:ref "new-list-item"
-                    :class "list-group-item"
-                    :type "text"
-                    :style {:width "100%"}
-                    :placeholder "Add new item..."
-                    :onClick (fn [e] ; TODO: Trigger on <Enter> instead
-                               (let [input-field (om/get-node owner "new-list-item")
-                                     new-item-title (.-value input-field)]
-                               (put! add-new new-item-title)))}]))))
+    (render-state [this {:keys [add-new add-item-text]}]
+                  (html
+                   [:form
+                    {:onSubmit (fn [e]
+                                (let [input-field (om/get-node owner "new-list-item")
+                                      new-item-title (.-value input-field)]
+                                  (put! add-new new-item-title)
+                                  (.-value input-field)
+                                  (om/set-state! owner :add-item-text "")
+                                  false))}
+                    [:input
+                     {:ref "new-list-item"
+                      :class "list-group-item"
+                      :type "text"
+                      :value add-item-text
+                      :onChange (fn [e]
+                                  (let [new-value (.. e -target -value)]
+                                    (om/set-state! owner :add-item-text new-value)))
+                      :style {:width "100%"}
+                      :placeholder "Add new item..."}]]))))
 
 (defn valid-list-item? [item]
   (not (clojure.string/blank? (item :title))))
@@ -51,7 +60,9 @@
     (display-name [this] "List")
     om/IInitState
     (init-state [_]
-                {:toggle-done (chan), :add-new (chan)})
+                {:toggle-done (chan)
+                 :add-new (chan)
+                 :add-item-text ""})
     om/IWillMount
     (will-mount [_]
                 (let [toggle-done (om/get-state owner :toggle-done)
@@ -73,7 +84,7 @@
                                  (om/transact! app :items (fn [items] (conj items new-item)))))
                              (recur)))))
     om/IRenderState
-    (render-state [this {:keys [toggle-done add-new]}]
+    (render-state [this {:keys [toggle-done add-new add-item-text]}]
                   (html [:div {:class "well-lg"}
                          [:h3 "My awesome tasks"]
                          [:div
@@ -83,7 +94,7 @@
                                          {:init-state {:toggle-done toggle-done}
                                           :key :id})
                            (om/build add-list-item-view app
-                                     {:init-state {:add-new add-new}})]]]))))
+                                     {:init-state {:add-new add-new :add-item-text add-item-text}})]]]))))
 
 (defn main []
   (om/root list-view app-state
