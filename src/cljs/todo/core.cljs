@@ -16,14 +16,19 @@
     om/IDisplayName
     (display-name [this] "List item")
     om/IRenderState
-    (render-state [this {:keys [toggle-done]}]
-            (html [:a
-                   {:class "list-group-item"
-                    :style {:text-decoration
-                            (if (item :done) "line-through" "none")}
-                    :href "#"
-                    :onClick (fn [e] (put! toggle-done @item))}
-                   (item :title)]))))
+    (render-state [this {:keys [toggle-done remove-old]}]
+                  (html [:a
+                         {:class "list-group-item"
+                          :style {:text-decoration
+                                  (if (item :done) "line-through" "none")}
+                          :href "#"
+                          :onClick (fn [e] (put! toggle-done @item))}
+                         (item :title)
+                         [:button {:class ["btn" "btn-xs" "pull-right"]
+                                   :onClick (fn [e]
+                                              (put! remove-old @item)
+                                              false)}
+                          [:span {:class ["glyphicon" "glyphicon-remove"]}]]]))))
 
 (defn add-list-item-view [app owner]
   (reify
@@ -61,11 +66,13 @@
     om/IInitState
     (init-state [_]
                 {:toggle-done (chan)
+                 :remove-old (chan)
                  :add-new (chan)
                  :add-item-text ""})
     om/IWillMount
     (will-mount [_]
                 (let [toggle-done (om/get-state owner :toggle-done)
+                      remove-old (om/get-state owner :remove-old)
                       add-new (om/get-state owner :add-new)]
                   (go-loop []
                            (let [item (<! toggle-done)
@@ -73,6 +80,13 @@
                              (om/transact! app :items
                                            (fn [items]
                                              (vec (replace {item new-item} items))))
+                             (recur)))
+                  (go-loop []
+                           (let [item (<! remove-old)
+                                 new-item (update-in item [:done] not)]
+                             (om/transact! app :items
+                                           (fn [items]
+                                             (vec (remove #(= % item) items))))
                              (recur)))
                   (go-loop []
                            (let [title (<! add-new)
@@ -84,14 +98,14 @@
                                  (om/transact! app :items (fn [items] (conj items new-item)))))
                              (recur)))))
     om/IRenderState
-    (render-state [this {:keys [toggle-done add-new add-item-text]}]
+    (render-state [this {:keys [toggle-done add-new add-item-text remove-old]}]
                   (html [:div {:class "well-lg"}
                          [:h3 "My awesome tasks"]
                          [:div
                           [:div
                            {:class "list-group"}
                            (om/build-all list-item-view (app :items)
-                                         {:init-state {:toggle-done toggle-done}
+                                         {:init-state {:toggle-done toggle-done :remove-old remove-old}
                                           :key :id})
                            (om/build add-list-item-view app
                                      {:init-state {:add-new add-new :add-item-text add-item-text}})]]]))))
