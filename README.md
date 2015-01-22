@@ -1,49 +1,26 @@
-# todo
+# todo-om
 
+A silly little Todo list app I created to learn about
+ClojureScript and Om.
+
+![Screenshot](https://cloud.githubusercontent.com/assets/226707/5853834/74c923d6-a27b-11e4-9d19-513b0c6db40e.png)
 
 ## Development
 
-Start a REPL (in a terminal: `lein repl`, or from Emacs: open a
-clj/cljs file in the project, then do `M-x cider-jack-in`. Make sure
-CIDER is up to date).
+Start a REPL (in a terminal: `lein repl`).
 
 In the REPL do
 
 ```clojure
 (run)
-(browser-repl)
 ```
 
 The call to `(run)` does two things, it starts the webserver at port
 10555, and also the Figwheel server which takes care of live reloading
 ClojureScript code and CSS. Give them some time to start.
 
-When you see the line `Successfully compiled "resources/public/app.js"
-in 21.36 seconds.`, you're ready to go. Browse to
+When you see a new prompt appear, you're ready to go. Browse to
 `http://localhost:10555` and enjoy.
-
-**Attention: It is not longer needed to run `lein figwheel`
-  separately. This is now taken care of behind the scenes**
-
-## Trying it out
-
-If all is well you now have a browser window saying 'Hello Chestnut',
-and a REPL prompt that looks like `cljs.user=>`.
-
-Open `resources/public/css/style.css` and change some styling of the
-H1 element. Notice how it's updated instantly in the browser.
-
-Open `src/cljs/todo/core.cljs`, and change `dom/h1` to
-`dom/h2`. As soon as you save the file, your browser is updated.
-
-In the REPL, type
-
-```
-(ns todo.core)
-(swap! app-state assoc :text "Interactivity FTW")
-```
-
-Notice again how the browser updates.
 
 ## Deploying to Heroku
 
@@ -75,10 +52,3 @@ lein with-profile -dev,+production uberjar && foreman start
 
 Now your app is running at
 [http://localhost:5000](http://localhost:5000) in production mode.
-
-## License
-
-Copyright © 2014 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
