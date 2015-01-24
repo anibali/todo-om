@@ -35,24 +35,21 @@
     om/IDisplayName
     (display-name [this] "Add list item")
     om/IRenderState
-    (render-state [this {:keys [add-new add-item-text]}]
+    (render-state [this {:keys [add-new new-item-title]}]
                   (html
                    [:form
                     {:onSubmit (fn [e]
-                                (let [input-field (om/get-node owner "new-list-item")
-                                      new-item-title (.-value input-field)]
-                                  (put! add-new new-item-title)
-                                  (.-value input-field)
-                                  (om/set-state! owner :add-item-text "")
-                                  false))}
+                                 (put! add-new new-item-title)
+                                 (om/set-state! owner :new-item-title "")
+                                 false)}
                     [:input
                      {:ref "new-list-item"
                       :class "list-group-item"
                       :type "text"
-                      :value add-item-text
+                      :value new-item-title
                       :onChange (fn [e]
                                   (let [new-value (.. e -target -value)]
-                                    (om/set-state! owner :add-item-text new-value)))
+                                    (om/set-state! owner :new-item-title new-value)))
                       :style {:width "100%"}
                       :placeholder "Add new item..."}]]))))
 
@@ -68,7 +65,7 @@
                 {:toggle-done (chan)
                  :remove-old (chan)
                  :add-new (chan)
-                 :add-item-text ""})
+                 :new-item-title ""})
     om/IWillMount
     (will-mount [_]
                 (let [toggle-done (om/get-state owner :toggle-done)
@@ -98,17 +95,19 @@
                                  (om/transact! app :items (fn [items] (conj items new-item)))))
                              (recur)))))
     om/IRenderState
-    (render-state [this {:keys [toggle-done add-new add-item-text remove-old]}]
+    (render-state [this {:keys [toggle-done add-new new-item-title remove-old]}]
                   (html [:div {:class "well-lg"}
                          [:h3 "My awesome tasks"]
                          [:div
                           [:div
                            {:class "list-group"}
                            (om/build-all list-item-view (app :items)
-                                         {:init-state {:toggle-done toggle-done :remove-old remove-old}
+                                         {:init-state {:toggle-done toggle-done
+                                                       :remove-old remove-old}
                                           :key :id})
                            (om/build add-list-item-view app
-                                     {:init-state {:add-new add-new :add-item-text add-item-text}})]]]))))
+                                     {:init-state {:add-new add-new
+                                                   :new-item-title new-item-title}})]]]))))
 
 (defn main []
   (om/root list-view app-state
