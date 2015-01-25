@@ -1,15 +1,18 @@
 (defproject todo "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
+  :description "A silly little Todo list app I created to learn about ClojureScript and Om"
+  :url "https://github.com/anibali/todo-om"
 
   :source-paths ["src/clj" "src/cljs"]
 
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2371" :scope "provided"]
-                 [ring "1.3.1"]
-                 [compojure "1.2.0"]
+                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
+                 [ring "1.3.2"]
+                 [compojure "1.3.1"]
                  [enlive "1.1.5"]
-                 [om "0.7.3"]
+                 [om "0.8.0-rc1"]
+                 [prismatic/om-tools "0.3.10"]
+                 [potemkin "0.3.4"]
                  [figwheel "0.1.4-SNAPSHOT"]
                  [environ "1.0.0"]
                  [com.cemerick/piggieback "0.1.3"]
