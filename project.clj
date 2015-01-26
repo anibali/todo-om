@@ -20,11 +20,10 @@
                  [leiningen "2.5.0"]]
 
   :plugins [[lein-cljsbuild "1.0.3"]
-            [lein-environ "1.0.0"]]
+            [lein-environ "1.0.0"]
+            [com.keminglabs/cljx "0.4.0"]]
 
   :min-lein-version "2.5.0"
-
-  :main todo.server
 
   :uberjar-name "todo.jar"
 
@@ -36,13 +35,21 @@
                                         :optimizations :none
                                         :pretty-print  true}}}}
 
-  :prep-tasks [["cljx" "once"]]
+  :prep-tasks [["cljx" "once"] "javac" "compile"]
+
+  :cljx {:builds [{:source-paths ["src/cljx"]
+                   :output-path "target/classes"
+                   :rules :clj}
+
+                  {:source-paths ["src/cljx"]
+                   :output-path "target/generated/cljs"
+                   :rules :cljs}]}
 
   :profiles {:dev {:repl-options {:init-ns todo.server
-                                  :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
+                                  :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl
+                                                     cljx.repl-middleware/wrap-cljx]}
 
                    :plugins [[lein-figwheel "0.1.4-SNAPSHOT"]
-                             [com.keminglabs/cljx "0.5.0"]
                              [lein-pdo "0.1.1"]]
 
                    :aliases {"cleantest" ["do" "clean," "cljx" "once," "test," "cljsbuild" "test"]
@@ -52,15 +59,9 @@
                               :port 3449
                               :css-dirs ["resources/public/css"]}
 
-                   :cljx {:builds [{:source-paths ["src/cljx"]
-                                    :output-path "target/classes"
-                                    :rules :clj}
-
-                                   {:source-paths ["src/cljx"]
-                                    :output-path "target/generated/cljs"
-                                    :rules :cljs}]}
-
                    :env {:is-dev true}
+
+                   :main todo.server
 
                    :cljsbuild {:builds {:app {:source-paths ["env/dev/cljs"]}}}}
 
