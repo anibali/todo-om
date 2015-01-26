@@ -5,20 +5,14 @@
             [om-tools.core :refer-macros [defcomponentk]]
             [om-tools.dom :include-macros true]
             [cljs.core.async :refer [put! chan <!]]
-            [sablono.core :as html :refer-macros [html]]))
+            [sablono.core :as html :refer-macros [html]]
+            [todo.validation :as v]))
 
 (defonce app-state (atom {
   :next-id 4
   :items [{:id 1, :title "Bake a cake", :done true}
           {:id 2, :title "Cake a clown", :done false}
           {:id 3, :title "Bake a cake", :done false}]}))
-
-(defn valid-list-item?
-  "Check whether a list item is valid or not.
-
-  A list item cannot have a blank title."
-  [item]
-  (not (clojure.string/blank? (item :title))))
 
 (defcomponentk list-item-view
   "Single todo list item display"
@@ -88,7 +82,7 @@
              (let [title action-data
                    id (@data :next-id)
                    new-item {:id id, :title title, :done false}]
-               (if (valid-list-item? new-item)
+               (if (v/valid-list-item? new-item)
                  (do
                    (om/transact! data :next-id inc)
                    (om/transact! data :items (fn [items] (conj items new-item)))))))

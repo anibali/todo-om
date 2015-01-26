@@ -7,20 +7,20 @@ ClojureScript and Om.
 
 ## Development
 
-Start a REPL (in a terminal: `lein repl`).
-
-In the REPL do
-
-```clojure
-(run)
+```sh
+lein rundev
 ```
 
-The call to `(run)` does two things, it starts the webserver at port
-10555, and also the Figwheel server which takes care of live reloading
-ClojureScript code and CSS. Give them some time to start.
+This command does three things:
 
-When you see a new prompt appear, you're ready to go. Browse to
-`http://localhost:10555` and enjoy.
+* It starts the webserver at port 10555
+* It starts a Figwheel server which takes care of live reloading
+  ClojureScript code and CSS.
+* It starts a task which watches `.cljx` files for changes and
+  generates corresponding Clojure and ClojureScript output.
+
+Once everything has finished starting up you will be able to browse to
+http://localhost:10555 and see the running app.
 
 ## Deploying to Heroku
 

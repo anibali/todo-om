@@ -24,9 +24,11 @@
 
   :min-lein-version "2.5.0"
 
+  :main todo.server
+
   :uberjar-name "todo.jar"
 
-  :cljsbuild {:builds {:app {:source-paths ["src/cljs"]
+  :cljsbuild {:builds {:app {:source-paths ["src/cljs" "target/generated/cljs"]
                              :compiler {:output-to     "resources/public/js/app.js"
                                         :output-dir    "resources/public/js/out"
                                         :source-map    "resources/public/js/out.js.map"
@@ -34,14 +36,29 @@
                                         :optimizations :none
                                         :pretty-print  true}}}}
 
+  :prep-tasks [["cljx" "once"]]
+
   :profiles {:dev {:repl-options {:init-ns todo.server
                                   :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
 
-                   :plugins [[lein-figwheel "0.1.4-SNAPSHOT"]]
+                   :plugins [[lein-figwheel "0.1.4-SNAPSHOT"]
+                             [com.keminglabs/cljx "0.5.0"]
+                             [lein-pdo "0.1.1"]]
+
+                   :aliases {"cleantest" ["do" "clean," "cljx" "once," "test," "cljsbuild" "test"]
+                             "rundev" ["pdo" "cljx" "auto," "run"]}
 
                    :figwheel {:http-server-root "public"
                               :port 3449
                               :css-dirs ["resources/public/css"]}
+
+                   :cljx {:builds [{:source-paths ["src/cljx"]
+                                    :output-path "target/classes"
+                                    :rules :clj}
+
+                                   {:source-paths ["src/cljx"]
+                                    :output-path "target/generated/cljs"
+                                    :rules :cljs}]}
 
                    :env {:is-dev true}
 
