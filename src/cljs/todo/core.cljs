@@ -6,13 +6,7 @@
             [om-tools.dom :include-macros true]
             [cljs.core.async :refer [put! chan <!]]
             [sablono.core :as html :refer-macros [html]]
-            [todo.validation :as v]))
-
-(defonce app-state (atom {
-  :next-id 4
-  :items [{:id 1, :title "Bake a cake", :done true}
-          {:id 2, :title "Cake a clown", :done false}
-          {:id 3, :title "Bake a cake", :done false}]}))
+            [todo.state :refer [app-state process-action]]))
 
 (defcomponentk list-item-view
   "Single todo list item display"
@@ -24,12 +18,13 @@
             :style {:text-decoration
                     (if (data :done) "line-through" "none")}
             :href "#"
-            :onClick (fn [e] (put! action-chan [:toggle-done @data]))}
+            :onClick (fn [e]
+                       (put! action-chan [:toggle-done @data]))}
            (data :title)
            [:button {:class ["btn" "btn-xs" "pull-right"]
                      :onClick (fn [e]
                                 (put! action-chan [:remove-item @data])
-                                false)}
+                                (.stopPropagation e))}
             [:span {:class ["glyphicon" "glyphicon-remove"]}]]])))
 
 (defcomponentk add-list-item-view
@@ -42,7 +37,7 @@
       {:onSubmit (fn [e]
                    (put! action-chan [:add-item new-item-title])
                    (swap! state assoc :new-item-title "")
-                   false)}
+                   (.preventDefault e))}
       [:input
        {:ref "new-list-item"
         :class "list-group-item"
@@ -64,29 +59,8 @@
   (will-mount [_]
     (let [action-chan (om/get-state owner :action-chan)]
       (go-loop []
-         (let [[action-name, action-data] (<! action-chan)]
-           (case action-name
-             :toggle-done
-             (let [item action-data
-                   new-item (update-in item [:done] not)]
-               (om/transact! data :items
-                             (fn [items]
-                               (vec (replace {item new-item} items)))))
-             :remove-item
-             (let [item action-data
-                   new-item (update-in item [:done] not)]
-               (om/transact! data :items
-                             (fn [items]
-                               (vec (remove #(= % item) items)))))
-             :add-item
-             (let [title action-data
-                   id (@data :next-id)
-                   new-item {:id id, :title title, :done false}]
-               (if (v/valid-list-item? new-item)
-                 (do
-                   (om/transact! data :next-id inc)
-                   (om/transact! data :items (fn [items] (conj items new-item)))))))
-           (recur)))))
+               (process-action (<! action-chan))
+               (recur))))
   (render-state [this {:keys [action-chan new-item-title]}]
     (html [:div {:class "well-lg"}
            [:h3 "My awesome tasks"]
