@@ -7,7 +7,7 @@
             [net.cgrand.enlive-html :refer [deftemplate]]
             [ring.middleware.reload :as reload]
             [environ.core :refer [env]]
-            [ring.adapter.jetty :refer [run-jetty]]))
+            [org.httpkit.server :refer [run-server]]))
 
 (deftemplate page
   (io/resource "index.html") [] [:body] (if is-dev? inject-devmode-html identity))
@@ -28,7 +28,7 @@
       (if is-dev? (start-figwheel))
       (let [port (Integer. (or port (env :port) 10555))]
         (print "Starting web server on port" port ".\n")
-        (run-jetty http-handler {:port port
+        (run-server http-handler {:port port
                           :join? false}))))
   server)
 
