@@ -23,7 +23,7 @@
 
   :plugins [[lein-cljsbuild "1.0.3"]
             [lein-environ "1.0.0"]
-            [com.keminglabs/cljx "0.4.0"]]
+            [org.clojars.cemerick/cljx "0.6.0-SNAPSHOT"]]
 
   :min-lein-version "2.5.0"
 
@@ -51,11 +51,9 @@
                                   :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl
                                                      cljx.repl-middleware/wrap-cljx]}
 
-                   :plugins [[lein-figwheel "0.1.4-SNAPSHOT"]
-                             [lein-pdo "0.1.1"]]
+                   :plugins [[lein-figwheel "0.1.4-SNAPSHOT"]]
 
-                   :aliases {"cleantest" ["do" "clean," "cljx" "once," "test," "cljsbuild" "test"]
-                             "rundev" ["pdo" "cljx" "auto," "run"]}
+                   :aliases {"cleantest" ["do" "clean," "cljx" "once," "test," "cljsbuild" "test"]}
 
                    :figwheel {:http-server-root "public"
                               :port 3449

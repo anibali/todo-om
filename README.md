@@ -8,19 +8,24 @@ ClojureScript and Om.
 ## Development
 
 ```sh
-lein rundev
+lein run
 ```
 
-This command does three things:
+This command does two things:
 
 * It starts the webserver at port 10555
 * It starts a Figwheel server which takes care of live reloading
   ClojureScript code and CSS.
-* It starts a task which watches `.cljx` files for changes and
-  generates corresponding Clojure and ClojureScript output.
 
 Once everything has finished starting up you will be able to browse to
 http://localhost:10555 and see the running app.
+
+```sh
+lein cljx auto
+```
+
+Run this task in a separate terminal to watch `.cljx` files for changes
+and generate corresponding Clojure and ClojureScript output.
 
 ## Deploying to Heroku
 
